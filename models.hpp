@@ -161,14 +161,14 @@ public:
 struct PersonComparator {
     bool operator()(const Person* a, const Person* b) const {
         if (a->first_name == b->first_name)
-            return a->last_name.compare(b->last_name) <= 0;
-        return a->first_name.compare(b->first_name) <= 0;
+            return a->last_name.compare(b->last_name) < 0;
+        return a->first_name.compare(b->first_name) < 0;
     }
 };
 
 struct CompanyComparator {
     bool operator()(const Company* a, const Company* b) const {
-        return a->get_name().compare(b->get_name()) <= 0;
+        return a->get_name().compare(b->get_name()) < 0;
     }
 };
 
