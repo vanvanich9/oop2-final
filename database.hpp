@@ -1,3 +1,5 @@
+#pragma once
+
 #define DATABASE_PATH "database.txt"
 
 #include <iostream>
@@ -7,13 +9,17 @@
 #include <fstream>
 #include <variant>
 #include <vector>
-#include "models.cpp"
+
+#include "models.hpp"
 
 using namespace std;
 
 class CandidateDatabase {
     private:
         vector<Candidate*> candidates;
+        bool is_candidate_exists(Candidate* candidate);
+        int get_candidate_index(Candidate* candidate);
+        void sort();
 
     public:
         CandidateDatabase();
@@ -26,6 +32,9 @@ class CandidateDatabase {
 class HRDatabase {
     private:
         vector<HR*> managers;
+        bool is_manager_exists(HR* manager);
+        int get_manager_index(HR* manager);
+        void sort();
 
     public:
         HRDatabase();
@@ -38,6 +47,9 @@ class HRDatabase {
 class DeveloperDatabase {
     private:
         vector<Developer*> developers;
+        bool is_developer_exists(Developer* developer);
+        int get_developer_index(Developer* developer);
+        void sort();
 
     public:
         DeveloperDatabase();
@@ -50,6 +62,9 @@ class DeveloperDatabase {
 class DirectorDatabase {
     private:
         vector<Director*> directors;
+        bool is_director_exists(Director* director);
+        int get_director_index(Director* director);
+        void sort();
 
     public:
         DirectorDatabase();
@@ -62,6 +77,9 @@ class DirectorDatabase {
 class CompanyDatabase {
     private:
         vector<Company*> companies;
+        bool is_company_exists(Company* company);
+        int get_company_index(Company* company);
+        void sort();
 
     public:
         CompanyDatabase();
@@ -87,24 +105,31 @@ vector<Candidate*> CandidateDatabase::get_all() {
 }
 
 void CandidateDatabase::add(Candidate* candidate) {
-    for(auto database_candidate: this->candidates) {
-        if(*database_candidate == *candidate) {
-            throw PersonExists();
-        }
+    if(is_candidate_exists(candidate)) {
+        throw PersonExists();
     }
     this->candidates.push_back(candidate);
+    sort();
 }
 
 void CandidateDatabase::remove(Candidate* candidate) {
-    int i = 0;
-    for(auto database_candidate : this->candidates) {
-        if(*candidate == *database_candidate) {
-            this->candidates.erase(this->candidates.begin() + i);
-            return;
-        }
-        i++;
+    if(!is_candidate_exists(candidate)) {
+        throw NotFound();
     }
-    throw NotFound();
+    int i = get_candidate_index(candidate);
+    this->candidates.erase(this->candidates.begin() + i);
+}
+
+void CandidateDatabase::sort() {
+    stable_sort(this->candidates.begin(), this->candidates.end(), PersonComparator());
+}
+
+bool CandidateDatabase::is_candidate_exists(Candidate* candidate) {
+    return binary_search(this->candidates.begin(), this->candidates.end(), candidate, PersonComparator());
+}
+
+int CandidateDatabase::get_candidate_index(Candidate* candidate) {
+    return lower_bound(this->candidates.begin(), this->candidates.end(), candidate, PersonComparator()) - this->candidates.begin();
 }
 
 HRDatabase::HRDatabase() {}
@@ -123,24 +148,31 @@ vector<HR*> HRDatabase::get_all() {
 }
 
 void HRDatabase::add(HR* manager) {
-    for(auto database_manager: this->managers) {
-        if(*database_manager == *manager) {
-            throw PersonExists();
-        }
+    if(is_manager_exists(manager)) {
+        throw PersonExists();
     }
     this->managers.push_back(manager);
+    sort();
 }
 
 void HRDatabase::remove(HR* manager) {
-    int i = 0;
-    for(auto database_manager : this->managers) {
-        if(*manager == *database_manager) {
-            this->managers.erase(this->managers.begin() + i);
-            return;
-        }
-        i++;
+    if(!is_manager_exists(manager)) {
+        throw NotFound();
     }
-    throw NotFound();
+    int i = get_manager_index(manager);
+    this->managers.erase(this->managers.begin() + i);
+}
+
+void HRDatabase::sort() {
+    stable_sort(this->managers.begin(), this->managers.end(), PersonComparator());
+}
+
+bool HRDatabase::is_manager_exists(HR* manager) {
+    return binary_search(this->managers.begin(), this->managers.end(), manager, PersonComparator());
+}
+
+int HRDatabase::get_manager_index(HR* manager) {
+    return lower_bound(this->managers.begin(), this->managers.end(), manager, PersonComparator()) - this->managers.begin();
 }
 
 DeveloperDatabase::DeveloperDatabase() {}
@@ -159,24 +191,31 @@ vector<Developer*> DeveloperDatabase::get_all() {
 }
 
 void DeveloperDatabase::add(Developer* developer) {
-    for(auto database_developer: this->developers) {
-        if(*database_developer == *developer) {
-            throw PersonExists();
-        }
+    if(is_developer_exists(developer)) {
+        throw PersonExists();
     }
     this->developers.push_back(developer);
+    sort();
 }
 
 void DeveloperDatabase::remove(Developer* developer) {
-    int i = 0;
-    for(auto database_developer : this->developers) {
-        if(*developer == *database_developer) {
-            this->developers.erase(this->developers.begin() + i);
-            return;
-        }
-        i++;
+    if(!is_developer_exists(developer)) {
+        throw NotFound();
     }
-    throw NotFound();
+    int i = get_developer_index(developer);
+    this->developers.erase(this->developers.begin() + i);
+}
+
+void DeveloperDatabase::sort() {
+    stable_sort(this->developers.begin(), this->developers.end(), PersonComparator());
+}
+
+bool DeveloperDatabase::is_developer_exists(Developer* developer) {
+    return binary_search(this->developers.begin(), this->developers.end(), developer, PersonComparator());
+}
+
+int DeveloperDatabase::get_developer_index(Developer* developer) {
+    return lower_bound(this->developers.begin(), this->developers.end(), developer, PersonComparator()) - this->developers.begin();
 }
 
 DirectorDatabase::DirectorDatabase() {}
@@ -195,24 +234,31 @@ vector<Director*> DirectorDatabase::get_all() {
 }
 
 void DirectorDatabase::add(Director* director) {
-    for(auto database_director: this->directors) {
-        if(*database_director == *director) {
-            throw PersonExists();
-        }
+    if(is_director_exists(director)) {
+        throw PersonExists();
     }
     this->directors.push_back(director);
+    sort();
 }
 
 void DirectorDatabase::remove(Director* director) {
-    int i = 0;
-    for(auto database_director : this->directors) {
-        if(*director == *database_director) {
-            this->directors.erase(this->directors.begin() + i);
-            return;
-        }
-        i++;
+    if(!is_director_exists(director)) {
+        throw NotFound();
     }
-    throw NotFound();
+    int i = get_director_index(director);
+    this->directors.erase(this->directors.begin() + i);
+}
+
+void DirectorDatabase::sort() {
+    stable_sort(this->directors.begin(), this->directors.end(), PersonComparator());
+}
+
+bool DirectorDatabase::is_director_exists(Director* director) {
+    return binary_search(this->directors.begin(), this->directors.end(), director, PersonComparator());
+}
+
+int DirectorDatabase::get_director_index(Director* director) {
+    return lower_bound(this->directors.begin(), this->directors.end(), director, PersonComparator()) - this->directors.begin();
 }
 
 CompanyDatabase::CompanyDatabase() {}
@@ -231,24 +277,31 @@ vector<Company*> CompanyDatabase::get_all() {
 }
 
 void CompanyDatabase::add(Company* company) {
-    for(auto database_company: this->companies) {
-        if(*database_company == *company) {
-            throw PersonExists();
-        }
+    if(is_company_exists(company)) {
+        throw PersonExists();
     }
     this->companies.push_back(company);
+    sort();
 }
 
 void CompanyDatabase::remove(Company* company) {
-    int i = 0;
-    for(auto database_company : this->companies) {
-        if(*company == *database_company) {
-            this->companies.erase(this->companies.begin() + i);
-            return;
-        }
-        i++;
+    if(!is_company_exists(company)) {
+        throw NotFound();
     }
-    throw NotFound();
+    int i = get_company_index(company);
+    this->companies.erase(this->companies.begin() + i);
+}
+
+void CompanyDatabase::sort() {
+    stable_sort(this->companies.begin(), this->companies.end(), CompanyComparator());
+}
+
+bool CompanyDatabase::is_company_exists(Company* company) {
+    return binary_search(this->companies.begin(), this->companies.end(), company, CompanyComparator());
+}
+
+int CompanyDatabase::get_company_index(Company* company) {
+    return lower_bound(this->companies.begin(), this->companies.end(), company, CompanyComparator()) - this->companies.begin();
 }
 
 CandidateDatabase candidate_database;

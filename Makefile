@@ -1,5 +1,5 @@
 build:
-	@c++ main.cpp
+	@c++ -w main.cpp
 
 run:
 	@./a.out

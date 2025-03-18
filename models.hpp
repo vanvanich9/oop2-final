@@ -1,7 +1,10 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include "exceptions.cpp"
+#include <algorithm>
+#include "exceptions.hpp"
 
 using namespace std;
 
@@ -74,6 +77,7 @@ private:
     void remove_from_database();
 
     int get_candidate_index(Candidate* candidate);
+    bool is_candidate_exists(Candidate* candidate);
 public:
     Company* company;
 
@@ -96,9 +100,11 @@ class CompanyEmployers {
 
         CompanyEmployers(Company* company);
 
+        bool is_person_exists(HR* manager);
         int get_person_index(HR* manager);
         void add_person(HR* manager);
         void remove_person(HR* manager);
+        bool is_person_exists(Developer* developer);
         int get_person_index(Developer* developer);
         void add_person(Developer* developer);
         void remove_person(Developer* developer);
@@ -126,7 +132,7 @@ class Company {
 
         friend class Director;
     public:
-        string get_name();
+        string get_name() const;
         string get_description();
         string get_director_first_name();
         string get_director_last_name();
@@ -150,6 +156,20 @@ public:
     void change_company_description(Company* company, string new_description);
     HR* add_company_manager(Company* company, Candidate* candidate);
     Developer* add_company_developer(Company* company, Candidate* candidate);
+};
+
+struct PersonComparator {
+    bool operator()(const Person* a, const Person* b) const {
+        if (a->first_name == b->first_name)
+            return a->last_name.compare(b->last_name) <= 0;
+        return a->first_name.compare(b->first_name) <= 0;
+    }
+};
+
+struct CompanyComparator {
+    bool operator()(const Company* a, const Company* b) const {
+        return a->get_name().compare(b->get_name()) <= 0;
+    }
 };
 
 Person::Person(string first_name, string last_name) {
@@ -234,21 +254,19 @@ void HR::person_information() {
     cout << "HR manager: " << this->first_name << " " << this->last_name << "." << endl;
 }
 
+bool HR::is_candidate_exists(Candidate* candidate) {
+    return binary_search(this->candidates.begin(), this->candidates.end(), candidate, PersonComparator());
+}
+
 int HR::get_candidate_index(Candidate* candidate) {
-    int i = 0;
-    for(auto manager_candidate : this->candidates) {
-        if(*manager_candidate == *candidate) {
-            return i;
-        }
-        i++;
-    }
-    return -1; // return -1 if not found
+    return lower_bound(this->candidates.begin(), this->candidates.end(), candidate, PersonComparator()) - this->candidates.begin();
 }
 
 void HR::add_candidate(Candidate* candidate) {
     if(!candidate->have_hr_manager()) {
         candidate->set_hr_manager(this);
         this->candidates.push_back(candidate);
+        stable_sort(this->candidates.begin(), this->candidates.end(), PersonComparator());
     } else {
         throw PermissionError();
     }
@@ -265,7 +283,7 @@ void HR::remove_candidate(Candidate* candidate) {
 }
 
 HR* HR::hire_hr_manager(Candidate* candidate) {
-    if(get_candidate_index(candidate) != -1 && this->company_employers->is_company_hr(this)) {
+    if(is_candidate_exists(candidate) && this->company_employers->is_company_hr(this)) {
         HR* manager = new HR(candidate, this->company);
         this->company_employers->add_person(manager);
         delete candidate;
@@ -276,7 +294,7 @@ HR* HR::hire_hr_manager(Candidate* candidate) {
 }
 
 Developer* HR::hire_developer(Candidate* candidate) {
-    if(get_candidate_index(candidate) != -1 && this->company_employers->is_company_hr(this)) {
+    if(is_candidate_exists(candidate) && this->company_employers->is_company_hr(this)) {
         Developer* developer = new Developer(candidate, this->company);
         company_employers->add_person(developer);
         delete candidate;
@@ -290,57 +308,52 @@ CompanyEmployers::CompanyEmployers(Company* company) {
     this->company = company;
 }
 
+bool CompanyEmployers::is_person_exists(HR* manager) {
+    return binary_search(this->managers.begin(), this->managers.end(), manager, PersonComparator());
+}
+
 int CompanyEmployers::get_person_index(HR* manager) {
-    int i = 0;
-    for(auto company_manager : this->managers) {
-        if(*company_manager == *manager) {
-            return i;
-        }
-        i++;
-    }
-    return -1; // return -1 if not found
+    return lower_bound(this->managers.begin(), this->managers.end(), manager, PersonComparator()) - this->managers.begin();
 }
 
 void CompanyEmployers::add_person(HR* manager) {
-    if(get_person_index(manager) == -1) {
+    if(is_person_exists(manager)) {
         this->managers.push_back(manager);
+        stable_sort(this->managers.begin(), this->managers.end(), PersonComparator());
     } else {
         throw PersonExists();
     }
 }
 
 void CompanyEmployers::remove_person(HR* manager) {
-    int index = get_person_index(manager);
-    if(index > -1) {
+    if(is_person_exists(manager)) {
+        int index = get_person_index(manager);
         this->managers.erase(this->managers.begin() + index);
     } else {
         throw PersonExists();
     }
 }
 
+bool CompanyEmployers::is_person_exists(Developer* developer) {
+    return binary_search(this->developers.begin(), this->developers.end(), developer, PersonComparator());
+}
+
 int CompanyEmployers::get_person_index(Developer* developer) {
-    int i = 0;
-    for(auto company_developer : this->developers) {
-        if(*company_developer == *developer) {
-            return i;
-        }
-        i++;
-    }
-    return -1; // return -1 if not found
+    return lower_bound(this->developers.begin(), this->developers.end(), developer, PersonComparator()) - this->developers.begin();
 }
 
 void CompanyEmployers::add_person(Developer* developer) {
-    if(get_person_index(developer) == -1) {
+    if(is_person_exists(developer) == -1) {
         this->developers.push_back(developer);
+        stable_sort(this->developers.begin(), this->developers.end(), PersonComparator());
     } else {
         throw PersonExists();
     }
-    this->developers.push_back(developer);
 }
 
 void CompanyEmployers::remove_person(Developer* developer) {
-    int index = get_person_index(developer);
-    if(index > -1) {
+    if(is_person_exists(developer)) {
+        int index = get_person_index(developer);
         this->developers.erase(this->developers.begin() + index);
     } else {
         throw PersonExists();
@@ -348,7 +361,7 @@ void CompanyEmployers::remove_person(Developer* developer) {
 }
 
 bool CompanyEmployers::is_company_hr(HR* manager) {
-    return get_person_index(manager) != -1;
+    return is_person_exists(manager) != -1;
 }
 
 Company::Company(string name, string description, Director* director) {
@@ -367,7 +380,7 @@ bool Company::is_company_director(Director* director) {
     return *this->director == *director;
 }
 
-string Company::get_name() {
+string Company::get_name() const {
     return this->name;
 }
 
