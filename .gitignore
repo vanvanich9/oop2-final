@@ -33,3 +33,6 @@
 
 # Database file
 database.txt
+
+# VS Code folders
+.vscode
