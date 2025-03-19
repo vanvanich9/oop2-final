@@ -18,8 +18,8 @@ class CompanyEmployers;
 
 class Person {
 private:
-    virtual void add_to_database();
-    virtual void remove_from_database();
+    virtual void add_to_database() = 0;
+    virtual void remove_from_database() = 0;
 public:
     string first_name;
     string last_name;
@@ -27,7 +27,7 @@ public:
 
     Person(string first_name, string last_name);
 
-    virtual void person_information();
+    virtual void person_information() = 0;
     bool operator==(const Person &person);
 };
 
@@ -176,8 +176,6 @@ Person::Person(string first_name, string last_name) {
     this->first_name = first_name;
     this->last_name = last_name;
 }
-
-void Person::person_information() {}
 
 bool Person::operator==(const Person &person) {
     return this->first_name == person.first_name && this->last_name == person.last_name;

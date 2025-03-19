@@ -310,7 +310,6 @@ DeveloperDatabase developer_database;
 DirectorDatabase director_database;
 CompanyDatabase company_database;
 
-void Person::add_to_database() {}
 void Person::remove_from_database() {}
 void Candidate::add_to_database() {
     candidate_database.add(this);
