@@ -10,7 +10,7 @@ struct PermissionError: public exception {
     }
 };
 
-struct PersonExists: public exception {
+struct PersonCompanyExists: public exception {
 	const char* what() const throw() {
     	return "Person or company exists";
     }

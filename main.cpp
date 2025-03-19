@@ -15,7 +15,7 @@ void manual_run() {
     Director* director = new Director("Ivan", "Ivanov");
     try {
         Director* director_duplicate = new Director("Ivan", "Ivanov");
-    } catch (PersonExists) {
+    } catch (PersonCompanyExists) {
         cout << "The same director already exists" << endl;
     }
     new Director("Anton", "Antonov");
@@ -35,7 +35,7 @@ void manual_run() {
     director2->create_company("Test company 2", "Init description");
     try {
         director2->create_company("Test company 2", "Init description");
-    } catch (PersonExists) {
+    } catch (PersonCompanyExists) {
         cout << "Company already exists" << endl;
     }
     Company* company2 = company_database.get("Test company 2");
@@ -57,7 +57,7 @@ void manual_run() {
     Candidate* candidate_developer = new Candidate("Aleksandr", "Aleksandrov");
     try {
         new Candidate("Aleksandr", "Aleksandrov");
-    } catch (PersonExists) {
+    } catch (PersonCompanyExists) {
         cout << "Candidate already exists" << endl;
     } 
     new Candidate("Aleksey", "Alekseev");

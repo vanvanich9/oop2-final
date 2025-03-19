@@ -323,7 +323,7 @@ void CompanyEmployers::add_person(HR* manager) {
         this->managers.push_back(manager);
         stable_sort(this->managers.begin(), this->managers.end(), PersonComparator());
     } else {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
 }
 
@@ -332,7 +332,7 @@ void CompanyEmployers::remove_person(HR* manager) {
         int index = get_person_index(manager);
         this->managers.erase(this->managers.begin() + index);
     } else {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
 }
 
@@ -349,7 +349,7 @@ void CompanyEmployers::add_person(Developer* developer) {
         this->developers.push_back(developer);
         stable_sort(this->developers.begin(), this->developers.end(), PersonComparator());
     } else {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
 }
 
@@ -358,7 +358,7 @@ void CompanyEmployers::remove_person(Developer* developer) {
         int index = get_person_index(developer);
         this->developers.erase(this->developers.begin() + index);
     } else {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
 }
 

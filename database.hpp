@@ -106,7 +106,7 @@ vector<Candidate*> CandidateDatabase::get_all() {
 
 void CandidateDatabase::add(Candidate* candidate) {
     if(is_candidate_exists(candidate)) {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
     this->candidates.push_back(candidate);
     sort();
@@ -149,7 +149,7 @@ vector<HR*> HRDatabase::get_all() {
 
 void HRDatabase::add(HR* manager) {
     if(is_manager_exists(manager)) {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
     this->managers.push_back(manager);
     sort();
@@ -192,7 +192,7 @@ vector<Developer*> DeveloperDatabase::get_all() {
 
 void DeveloperDatabase::add(Developer* developer) {
     if(is_developer_exists(developer)) {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
     this->developers.push_back(developer);
     sort();
@@ -235,7 +235,7 @@ vector<Director*> DirectorDatabase::get_all() {
 
 void DirectorDatabase::add(Director* director) {
     if(is_director_exists(director)) {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
     this->directors.push_back(director);
     sort();
@@ -278,7 +278,7 @@ vector<Company*> CompanyDatabase::get_all() {
 
 void CompanyDatabase::add(Company* company) {
     if(is_company_exists(company)) {
-        throw PersonExists();
+        throw PersonCompanyExists();
     }
     this->companies.push_back(company);
     sort();
