@@ -273,7 +273,7 @@ void HR::add_candidate(Candidate* candidate) {
 }
 
 void HR::remove_candidate(Candidate* candidate) {
-    if(!candidate->is_hr_manager(this)) {
+    if(candidate->is_hr_manager(this)) {
         candidate->set_hr_manager(nullptr);
         int index = get_candidate_index(candidate);
         this->candidates.erase(this->candidates.begin() + index);
@@ -286,6 +286,7 @@ HR* HR::hire_hr_manager(Candidate* candidate) {
     if(is_candidate_exists(candidate) && this->company_employers->is_company_hr(this)) {
         HR* manager = new HR(candidate, this->company);
         this->company_employers->add_person(manager);
+        remove_candidate(candidate);
         delete candidate;
         return manager;
     } else {
@@ -297,6 +298,7 @@ Developer* HR::hire_developer(Candidate* candidate) {
     if(is_candidate_exists(candidate) && this->company_employers->is_company_hr(this)) {
         Developer* developer = new Developer(candidate, this->company);
         company_employers->add_person(developer);
+        remove_candidate(candidate);
         delete candidate;
         return developer;
     } else {
@@ -317,7 +319,7 @@ int CompanyEmployers::get_person_index(HR* manager) {
 }
 
 void CompanyEmployers::add_person(HR* manager) {
-    if(is_person_exists(manager)) {
+    if(!is_person_exists(manager)) {
         this->managers.push_back(manager);
         stable_sort(this->managers.begin(), this->managers.end(), PersonComparator());
     } else {
@@ -343,7 +345,7 @@ int CompanyEmployers::get_person_index(Developer* developer) {
 }
 
 void CompanyEmployers::add_person(Developer* developer) {
-    if(is_person_exists(developer) == -1) {
+    if(!is_person_exists(developer)) {
         this->developers.push_back(developer);
         stable_sort(this->developers.begin(), this->developers.end(), PersonComparator());
     } else {
@@ -361,7 +363,7 @@ void CompanyEmployers::remove_person(Developer* developer) {
 }
 
 bool CompanyEmployers::is_company_hr(HR* manager) {
-    return is_person_exists(manager) != -1;
+    return is_person_exists(manager);
 }
 
 Company::Company(string name, string description, Director* director) {
